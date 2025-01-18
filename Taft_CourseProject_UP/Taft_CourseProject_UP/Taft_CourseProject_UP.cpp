@@ -4,6 +4,9 @@
 using namespace std;
 
 int const maxInputLength = 15;
+int const maxWordLength = 6;
+int const maxWords = 5;
+
 
 int const maxSize = 13; //The maximal size that the board can be
 int const minSize = 7; //The minimal size that the board can be
@@ -12,9 +15,9 @@ int preset = 0; //The size that the board is
 bool turn = 1; //1 - Defenders, 0 - Attackers
 int moves = 0; //Moves taken so far
 int defCount = 0; //The count of the Defenders' figures
-int defMaxCount = preset + 1;
+int defDeadCount = 0; //The count of the dead Defenders' figures
 int attCount = 0; //The count of the Attackers' figures
-int attMaxCount = defMaxCount * 2;
+int attDeadCount = 0; //The count of the dead Attackers' figures
 bool gameEnd = false;
 
 char PreviousAttMove[] = { '0', '0', '0', '0' };//x1, y1, x2, y2 (x1, y1 - last position, x2, y2 - current position)
@@ -25,6 +28,30 @@ char** board = new char* [preset];
 void Clear() //Clears the console and sets the cursor on the top left space
 {
 	cout << "\x1B[2J\x1B[H";
+}
+
+void Win() //Prints the Win Screen
+{
+	Clear();
+	cout << "========================\n";
+	if (!turn)
+	{
+		cout << setw(19) << "Attackers won!";
+	}
+	else
+	{
+		cout << setw(19) << "Defenders won!";
+	}
+	cout << "\n========================\n";
+	if (!turn)
+	{
+		cout << "The king has been caught! The kingdom falls!";
+	}
+	else
+	{
+		cout << "The king escaped! The kingdom will prevail!";
+	}
+	gameEnd = true;
 }
 
 void CountFigurines() // Counts the amount of every figurine there is
@@ -79,6 +106,15 @@ void PrintBoard() // Prints the board
 		}
 		cout << endl;
 	}
+	cout << endl;
+	cout << endl;
+	if (turn)
+		cout << "Defenders to move!";
+	else
+		cout << "Attackers to move!";
+
+	cout << endl;
+	cout << endl;
 }
 
 void setup7x7() // Sets up the board on a 7x7 preset
@@ -128,7 +164,6 @@ void setup7x7() // Sets up the board on a 7x7 preset
 	board[preset - 1][0] = 'X';
 	board[preset - 1][preset - 1] = 'X';
 	board[0][preset - 1] = 'X';
-	PrintBoard();
 }
 
 void setup9x9() // Sets up the board on a 9x9 preset
@@ -178,7 +213,7 @@ void setup9x9() // Sets up the board on a 9x9 preset
 	board[preset - 1][0] = 'X';
 	board[preset - 1][preset - 1] = 'X';
 	board[0][preset - 1] = 'X';
-	PrintBoard();
+
 }
 
 void setup11x11() // Sets up the board on a 11x11 preset
@@ -232,7 +267,7 @@ void setup11x11() // Sets up the board on a 11x11 preset
 	board[preset - 1][0] = 'X';
 	board[preset - 1][preset - 1] = 'X';
 	board[0][preset - 1] = 'X';
-	PrintBoard();
+
 }
 
 void setup13x13() // Sets up the board on a 13x13 preset
@@ -290,7 +325,6 @@ void setup13x13() // Sets up the board on a 13x13 preset
 	board[preset - 1][0] = 'X';
 	board[preset - 1][preset - 1] = 'X';
 	board[0][preset - 1] = 'X';
-	PrintBoard();
 }
 
 bool InitializeBoard(bool check) //Sets up the board and makes sure that the parameters given are correct
@@ -351,24 +385,56 @@ void SaveMove(char x1, char y1, char x2, char y2) //Saves the coordinated of the
 
 bool IsMoveLegal(char x1, char y1, char x2, char y2) //Checks if the move is along the rules or not
 {
-	int trueX1 = x1 - 'A';
-	int trueY1 = y1 - '0';
-	int trueX2 = x2 - 'A';
-	int trueY2 = y2 - '0';
 
+	int trueX1 = (int)(x1 - 'A' - 1);
+	int trueY1 = (int)(y1 - '0' - 1);
+	int trueX2 = (int)(x2 - 'A' - 1);
+	int trueY2 = (int)(y2 - '0' - 1);
+
+	bool x1Correct = trueX1 >= 0 && trueX1 <= preset - 1;
+	bool y1Correct = trueY1 >= 0 && trueY1 <= preset - 1;
+	bool x2Correct = trueX2 >= 0 && trueX2 <= preset - 1;
+	bool y2Correct = trueY2 >= 0 && trueY2 <= preset - 1;
+
+	if (!(x1Correct || x2Correct || y1Correct || y2Correct))
+		return false;
+
+	bool xAxis = trueX1 == trueX2;
+	bool yAxis = trueY1 == trueY2;
 	if (turn)
 	{
-		bool xAxis = trueX1 == trueX2;
-		bool yAxis = trueY1 == trueY2;
-		if (board[trueX1][trueY1] == 'K' && board[trueX2][trueY2] == 'X' && xAxis ^ yAxis)
+		cout << (board[trueX1][trueY1] == 'D');
+		cout << (board[trueX2][trueY2] == 'E');
+		cout << (xAxis ^ yAxis);
+
+		if (board[trueX1][trueY1] == 'D' && board[trueX2][trueY2] == 'E' && xAxis ^ yAxis)
 		{
 			return true;
 		}
+		else
+			return false;
+		if (board[trueX1][trueY1] == 'K' && xAxis ^ yAxis)
+		{
+			if (board[trueX2][trueY2] == 'X' || board[trueX2][trueY2] == 'E')
+				return true;
+			else
+				return false;
+		}
+		else
+			return false;
 	}
+	else
+	{
+		if (board[trueX1][trueY1] == 'A' && xAxis ^ yAxis && board[trueX2][trueY2])
+			return true;
+		else
+			return false;
+	}
+
 	return 1;
 }
 
-void IsKingOnX()
+void IsKingOnX() // Checks if the king is on one of the corners and if he is it displays win for defenders
 {
 	bool isOnTopLeft = board[0][0] == 'K';
 	bool isOnTopRight = board[preset - 1][0] == 'K';
@@ -441,6 +507,16 @@ void RemoveFigurine(char x, char y) //Removes a figurine at the given coordinate
 {
 	cout << "\nFigurine on coordinates " << x << ", " << y << " with symbol " << board[x][y] << " has been taken!";
 	board[x][y] = 'E';
+	if (board[x][y] == 'A')
+	{
+		attCount--;
+		attDeadCount++;
+	}
+	if (board[x][y] == 'D')
+	{
+		defCount--;
+		defDeadCount++;
+	}
 }
 
 void IsFigurineCaptured() //Checks if any figurine has two other figurines (or an X and a figurine) on opposite sides
@@ -500,9 +576,9 @@ void IsFigurineCaptured() //Checks if any figurine has two other figurines (or a
 	}
 }
 
-void Move(char x1, char y1, char x2, char y2) // Makes the move chosen by the player
+void Move(char x1, char y1, char x2, char y2) // Makes the move chosen by the player if it is legal
 {
-	if (IsMoveLegal(x1, y1, x2, y1))
+	if (IsMoveLegal(x1, y1, x2, y2))
 	{
 		board[x2][y2] = board[x1][y1];
 		board[x1][y1] = 'E';
@@ -521,7 +597,20 @@ void Move(char x1, char y1, char x2, char y2) // Makes the move chosen by the pl
 
 }
 
-void Rules()
+void Back() //Turns back one move
+{
+	turn = !turn;
+	if (turn)
+	{
+		Move(PreviousDefMove[2], PreviousDefMove[3], PreviousDefMove[0], PreviousDefMove[1]);
+	}
+	else
+	{
+		Move(PreviousAttMove[2], PreviousAttMove[3], PreviousAttMove[0], PreviousAttMove[1]);
+	}
+}
+
+void Rules() //Prints the rules of the game
 {
 	cout << "\nRules of the game:\n" <<
 		"1. Setup and Pieces\n" <<
@@ -541,10 +630,10 @@ void Info() // Writes the info about the game situation(Player on turn, Number o
 {
 	cout << "\nDefenders: " <<
 		"\nAlive - " << defCount <<
-		"\nDead - " << defMaxCount - defCount <<
+		"\nDead - " << defDeadCount <<
 		"\nAttackers: " <<
 		"\nAlive - " << attCount <<
-		"\nDead - " << attMaxCount - attCount;
+		"\nDead - " << attDeadCount;
 	if (!gameEnd)
 	{
 		if (turn)
@@ -562,7 +651,8 @@ void Help() // Gives a list with the possible commands
 		"2. Back - Takes back one move\n" <<
 		"3. Quit - Leaves the game\n" <<
 		"4. Info - Gives you the info about the current situation of the game\n" <<
-		"5. Help - Brings out this list\n";
+		"5. Help - Brings out this list\n" <<
+		"6. Rules - Gives you the rules of the game\n";
 }
 
 void Quit() //Leaves the game
@@ -571,36 +661,10 @@ void Quit() //Leaves the game
 	Info();
 }
 
-void Win() //Prints the Win Screen
-{
-	Clear();
-	cout << "========================\n";
-	if (!turn)
-	{
-		cout << setw(19) << "Attackers won!";
-	}
-	else
-	{
-		cout << setw(19) << "Defenders won!";
-	}
-	cout << "\n========================\n";
-	if (!turn)
-	{
-		cout << "The king has been caught! The kingdom falls!";
-	}
-	else
-	{
-		cout << "The king escaped! The kingdom will prevail!";
-	}
-	gameEnd = true;
-}
-
-
 int main()
 {
 	cout << "Choose a setup (use the number in the brackets):" <<
 		"\n7x7(7)" <<
-		"\n9x9(9)" <<
 		"\n9x9(9)" <<
 		"\n11x11(11)" <<
 		"\n13x13(13)" <<
@@ -611,5 +675,75 @@ int main()
 	{
 		check = InitializeBoard(check);
 	}
+	PrintBoard();
 
+	cout << "\nEnter a command (Write 'Help' for commands):\n";
+	char input[maxInputLength];
+	cin.getline(input, maxInputLength);
+
+	while (!gameEnd)
+	{
+
+		PrintBoard();
+		char words[maxWords][maxWordLength];
+		char currentWord[maxWordLength];
+		int wordIndex = 0;
+		int wordCount = 0;
+
+		for (int i = 0; ; ++i) {
+			if (input[i] == ' ' || input[i] == '\0') {
+				if (wordIndex > 0) {
+					currentWord[wordIndex] = '\0';
+
+					int j = 0;
+					while (currentWord[j] != '\0') {
+						words[wordCount][j] = currentWord[j];
+						j++;
+					}
+					words[wordCount][j] = '\0';
+					wordCount++;
+
+					wordIndex = 0;
+				}
+				if (input[i] == '\0') {
+					break;
+				}
+			}
+			else {
+				currentWord[wordIndex++] = input[i];
+			}
+		}
+
+		if (strcmp(words[0], "Move") == 0) {
+			Move(words[1][0], words[2][0], words[3][0], words[4][0]);
+		}
+		else if (strcmp(words[0], "Back") == 0) {
+			Back();
+		}
+		else if (strcmp(words[0], "Quit") == 0) {
+			Quit();
+		}
+		else if (strcmp(words[0], "Info") == 0) {
+			Info();
+		}
+		else if (strcmp(words[0], "Help") == 0) {
+			Help();
+		}
+		else if (strcmp(words[0], "Rules") == 0) {
+			Rules();
+		}
+		else {
+			cout << "\nInvalid command!\n";
+		}
+
+
+
+		cout << "\nEnter a command (Write 'Help' for commands):\n";
+		cin.getline(input, maxInputLength);
+	}
+	for (int i = 0; i < preset; i++)
+	{
+		delete[] board[i];
+	}
+	delete[] board;
 }
