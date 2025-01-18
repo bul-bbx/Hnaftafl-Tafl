@@ -1,2 +1,6 @@
 ﻿  Taft_CourseProject_UP.cpp
+C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(451,23): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
+C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(451,31): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
+C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(524,23): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
+C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(524,31): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
   Taft_CourseProject_UP.vcxproj -> C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\x64\Debug\Taft_CourseProject_UP.exe
