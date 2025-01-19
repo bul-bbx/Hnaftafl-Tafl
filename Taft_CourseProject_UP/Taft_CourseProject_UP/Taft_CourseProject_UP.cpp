@@ -20,21 +20,20 @@ int attCount = 0; //The count of the Attackers' figures
 int attDeadCount = 0; //The count of the dead Attackers' figures
 bool gameEnd = false;
 
-char PreviousAttMove[] = { '0', '0', '0', '0' };//x1, y1, x2, y2 (x1, y1 - last position, x2, y2 - current position)
-char PreviousDefMove[] = { '0', '0', '0', '0' };//x1, y1, x2, y2 (x1, y1 - last position, x2, y2 - current position)
-
 char** board = new char* [preset];
+char** boardDef = new char* [preset];
+char** boardAtt = new char* [preset];
 
 void Clear() //Clears the console and sets the cursor on the top left space
 {
 	cout << "\x1B[2J\x1B[H";
 }
 
-void Win() //Prints the Win Screen
+void Win(char character) //Prints the Win Screen
 {
 	Clear();
 	cout << "========================\n";
-	if (!turn)
+	if (character == 'A')
 	{
 		cout << setw(19) << "Attackers won!";
 	}
@@ -43,7 +42,7 @@ void Win() //Prints the Win Screen
 		cout << setw(19) << "Defenders won!";
 	}
 	cout << "\n========================\n";
-	if (!turn)
+	if (character == 'A')
 	{
 		cout << "The king has been caught! The kingdom falls!";
 	}
@@ -76,36 +75,42 @@ void PrintBoard() // Prints the board
 	{
 		cout << (char)('A' + i) << " "; //Sets the top orienting row (the letters for the spaces)
 	}
+	cout << "| " << endl;
+	for (int i = 0; i < 2 * (preset + 4) - 1; i++)
+		cout << "-"; //Sets the divisor between the orienting row and the board
 	cout << endl;
-	for (int i = 0; i < preset + 3; i++)
-		cout << "- "; //Sets the divisor between the orienting row and the board
-	cout << endl;
+
 	for (int i = 0; i < preset; i++)
 	{
 		cout << setw(2) << i + 1 << "| "; //Sets the left most orienting column (the numbers for the spaces)
 		for (int k = 0; k < preset; k++)
 		{
-			if (i == preset / 2 && k == preset / 2)
+
+			switch (board[i][k])
 			{
-				if (board[i][k] != 'K') //Checks if the king is in the middle and if he isn't sets it to an X
-					cout << "X ";
-				else
-					cout << "K ";
+			case 'E': cout << "· "; break;
+			case 'A': cout << "A "; break;
+			case 'D': cout << "D "; break;
+			case 'K': cout << "K "; break;
+			case 'X': cout << "X "; break;
 			}
-			else
-			{
-				switch (board[i][k])
-				{
-				case 'E': cout << "· "; break;
-				case 'A': cout << "A "; break;
-				case 'D': cout << "D "; break;
-				case 'K': cout << "K "; break;
-				case 'X': cout << "X "; break;
-				}
-			}
+
 		}
+		cout << "|" << i + 1; //Sets the right most orienting column (the numbers for the spaces)
 		cout << endl;
 	}
+
+	for (int i = 0; i < 2 * (preset + 4) - 1; i++)
+		cout << "-"; //Sets the divisor between the orienting row and the board
+
+	cout << endl << "  | ";
+	for (int i = 0; i < preset; i++)
+	{
+		cout << (char)('A' + i) << " "; //Sets the top orienting row (the letters for the spaces)
+	}
+	cout << "| " << endl;
+
+	cout << endl;
 	cout << endl;
 	cout << endl;
 	if (turn)
@@ -143,7 +148,6 @@ void setup7x7() // Sets up the board on a 7x7 preset
 	board[preset - 2][preset / 2] = 'A';
 	board[preset / 2][1] = 'A';
 	board[preset / 2][preset - 2] = 'A';
-	CountFigurines();
 
 	//Defenders
 	board[preset / 2][preset / 2 + 1] = 'D';
@@ -192,7 +196,7 @@ void setup9x9() // Sets up the board on a 9x9 preset
 	board[preset - 2][preset / 2] = 'A';
 	board[preset / 2][1] = 'A';
 	board[preset / 2][preset - 2] = 'A';
-	CountFigurines();
+
 
 	//Defenders
 	board[preset / 2][preset / 2 + 1] = 'D';
@@ -242,7 +246,7 @@ void setup11x11() // Sets up the board on a 11x11 preset
 	board[preset - 2][preset / 2] = 'A';
 	board[preset / 2][1] = 'A';
 	board[preset / 2][preset - 2] = 'A';
-	CountFigurines();
+
 
 	//Defenders
 	board[preset / 2][preset / 2 + 1] = 'D';
@@ -296,7 +300,6 @@ void setup13x13() // Sets up the board on a 13x13 preset
 	board[preset - 2][preset / 2] = 'A';
 	board[preset / 2][1] = 'A';
 	board[preset / 2][preset - 2] = 'A';
-	CountFigurines();
 
 	//Defenders
 	board[preset / 2][preset / 2 + 1] = 'D';
@@ -334,11 +337,19 @@ bool InitializeBoard(bool check) //Sets up the board and makes sure that the par
 	if (numericCheck || preset == 0 || preset == ' ')
 	{
 		board = new char* [preset];
-		for (int i = 0; i < preset; i++)
+		boardDef = new char* [preset];
+		boardAtt = new char* [preset];
+		;		for (int i = 0; i < preset; i++)
 		{
 			board[i] = new char[preset];
+			boardDef[i] = new char[preset];
+			boardAtt[i] = new char[preset];
 			for (int k = 0; k < preset; k++)
+			{
 				board[i][k] = '0';
+				boardDef[i][k] = '0';
+				boardAtt[i][k] = '0';
+			}
 		}
 		switch (preset)
 		{
@@ -365,21 +376,27 @@ bool InitializeBoard(bool check) //Sets up the board and makes sure that the par
 	return check;
 }
 
-void SaveMove(char x1, char y1, char x2, char y2) //Saves the coordinated of the change of the last movement
+void SaveMove() //Saves the coordinated of the change of the last movement
 {
-	if (turn)
+	if (!turn)
 	{
-		PreviousDefMove[0] = x1;
-		PreviousDefMove[1] = y1;
-		PreviousDefMove[2] = x2;
-		PreviousDefMove[3] = y2;
+		for (int i = 0; i < preset; i++)
+		{
+			for (int k = 0; k < preset; k++)
+			{
+				boardDef[i][k] = board[i][k];
+			}
+		}
 	}
 	else
 	{
-		PreviousAttMove[0] = x1;
-		PreviousAttMove[1] = y1;
-		PreviousAttMove[2] = x2;
-		PreviousAttMove[3] = y2;
+		for (int i = 0; i < preset; i++)
+		{
+			for (int k = 0; k < preset; k++)
+			{
+				boardAtt[i][k] = board[i][k];
+			}
+		}
 	}
 }
 
@@ -399,39 +416,78 @@ bool IsMoveLegal(char x1, char y1, char x2, char y2) //Checks if the move is alo
 	if (!(x1Correct || x2Correct || y1Correct || y2Correct))
 		return false;
 
+
+
 	bool xAxis = trueX1 == trueX2;
 	bool yAxis = trueY1 == trueY2;
-	if (turn)
+	if (xAxis ^ yAxis)
 	{
-		cout << (board[trueX1][trueY1] == 'D');
-		cout << (board[trueX2][trueY2] == 'E');
-		cout << (xAxis ^ yAxis);
-
-		if (board[trueX1][trueY1] == 'D' && board[trueX2][trueY2] == 'E' && xAxis ^ yAxis)
+		if (xAxis)
 		{
-			return true;
+			if (trueX1 < trueX2)
+				for (int i = trueX1; i < trueX2; i++)
+				{
+					if (board[trueY1][i] != 'E')
+					{
+						return false;
+					}
+				}
+			else
+				for (int i = trueX2; i < trueX1; i++)
+				{
+					if (board[trueY1][i] != 'E')
+					{
+						return false;
+					}
+				}
 		}
 		else
-			return false;
-		if (board[trueX1][trueY1] == 'K' && xAxis ^ yAxis)
 		{
-			if (board[trueX2][trueY2] == 'X' || board[trueX2][trueY2] == 'E')
+			if (trueY1 < trueY2)
+				for (int i = trueY1; i < trueY2; i++)
+				{
+					if (board[i][trueX1] != 'E')
+					{
+						return false;
+					}
+				}
+			else
+				for (int i = trueY2; i < trueY1; i++)
+				{
+					if (board[i][trueX1] != 'E')
+					{
+						return false;
+					}
+				}
+		}
+		if (turn)
+		{
+			if (board[trueY1][trueX1] == 'D' && board[trueY2][trueX2] == 'E' && xAxis ^ yAxis)
+			{
+				return true;
+			}
+			else
+			{
+				if (board[trueY1][trueX1] == 'K' && xAxis ^ yAxis)
+				{
+					if (board[trueY2][trueX2] == 'X' || board[trueY2][trueX2] == 'E')
+						return true;
+					else
+						return false;
+				}
+				else
+					return false;
+			}
+		}
+		else
+		{
+			if (board[trueY1][trueX1] == 'A' && xAxis ^ yAxis && board[trueY2][trueX2])
 				return true;
 			else
 				return false;
 		}
-		else
-			return false;
-	}
-	else
-	{
-		if (board[trueX1][trueY1] == 'A' && xAxis ^ yAxis && board[trueX2][trueY2])
-			return true;
-		else
-			return false;
 	}
 
-	return 1;
 }
 
 void IsKingOnX() // Checks if the king is on one of the corners and if he is it displays win for defenders
@@ -442,7 +498,7 @@ void IsKingOnX() // Checks if the king is on one of the corners and if he is it 
 	bool isOnBottomRight = board[preset - 1][preset - 1] == 'K';
 	if (isOnTopLeft && isOnTopRight && isOnBottomLeft && isOnBottomRight)
 	{
-		Win();
+		Win('D');
 	}
 }
 
@@ -454,49 +510,46 @@ void IsKingCaptured()//Checks if the king has two other figurines (or an X and a
 		for (int k = 0; k < preset; k++)
 		{
 			bool figurineIsKing = board[i][k] == 'K'; //Checks if the figurine being taken is empty or safe space
-			if (i == 0 || i == preset - 1) //Checks if the current figurine is on the left-most or right-most column
+			if (figurineIsKing)
 			{
-				bool surround = board[i][k - 1] == board[i][k + 1] || board[i][k - 1] == 'X' || board[i][k + 1] == 'X'; //Checks if a figurine is surrounded
-				bool emptySurroundings = board[i][k - 1] != 'E'; //Checks if the surroundings are empty
-				bool figurineIsNotSame = board[i][k] != board[i][k - 1]; //Checks if figurine is not the same as the surrounding ones
-				if (surround && emptySurroundings && figurineIsKing && figurineIsNotSame)
+				if (i == 0 || i == preset - 1) //Checks if the current figurine is on the left-most or right-most column
 				{
-					Win();
-				}
-			}
-			else
-			{
-				if (k == 0 || k == preset - 1)//Checks if a figurine is on the top or bottom row
-				{
-					bool surround = board[i - 1][k] == board[i + 1][k] || board[i - 1][k] == 'X' || board[i + 1][k] == 'X'; //Checks if a figurine is surrounded
-					bool emptySurroundings = board[i + 1][k] != 'E'; //Checks if the surroundings are empty
-					bool figurineIsNotSame = board[i][k] != board[i + 1][k]; //Checks if figurine is not the same as the surrounding ones
-					if (surround && emptySurroundings && figurineIsKing && figurineIsNotSame)
+					bool surroundI = board[i][k - 1] == board[i][k + 1] || board[i][k - 1] == 'X' || board[i][k + 1] == 'X'; //Checks if a figurine is surrounded
+					bool emptySurroundings = board[i][k - 1] != 'E'; //Checks if the surroundings are empty
+					bool figurineIsNotDef = board[i][k - 1] != 'D'; //Checks if figurine is not the same as the surrounding ones
+					if (surroundI && emptySurroundings && figurineIsNotDef)
 					{
-						Win();
+						Win('A');
 					}
 				}
 				else
 				{
-					bool surroundI = board[i - 1][k] == board[i + 1][k] || board[i - 1][k] == 'X' || board[i + 1][k] == 'X'; //Checks if a figurine is surrounded on the i axis
-					bool surroundK = board[i][k - 1] == board[i][k + 1] || board[i][k - 1] == 'X' || board[i][k + 1] == 'X'; //Checks if a figurine is surrounded on the k axis
-					bool figurineIsNotSame = board[i][k] != board[i + 1][k] || board[i][k] != board[i][k - 1]; //Checks if figurine is not the same as the surrounding ones
-					bool emptySurroundingsK = board[i][k - 1] != 'E'; //Checks if surroundings on the k axis are empty
-					bool emptySurroundingsI = board[i - 1][k] != 'E'; //Checks if surroundings on the i axis are empty
+					if (k == 0 || k == preset - 1)//Checks if a figurine is on the top or bottom row
+					{
+						bool surroundK = board[i - 1][k] == board[i + 1][k] || board[i - 1][k] == 'X' || board[i + 1][k] == 'X'; //Checks if a figurine is surrounded
+						bool emptySurroundings = board[i + 1][k] != 'E'; //Checks if the surroundings are empty
+						bool figurineIsNotDef = board[i + 1][k] != 'D'; //Checks if figurine is not the same as the surrounding ones
+						if (surroundK && emptySurroundings && figurineIsNotDef)
+						{
+							Win('A');
+						}
+					}
+					else
+					{
+						bool surroundI = board[i - 1][k] == board[i + 1][k] || board[i - 1][k] == 'X' || board[i + 1][k] == 'X'; //Checks if a figurine is surrounded on the i axis
+						bool surroundK = board[i][k - 1] == board[i][k + 1] || board[i][k - 1] == 'X' || board[i][k + 1] == 'X'; //Checks if a figurine is surrounded on the k axis
+						bool figurineIsNotDef = (board[i + 1][k] != 'D' && board[i - 1][k] != 'D') || (board[i][k - 1] != 'D' && board[i][k + 1] != 'D'); //Checks if the surrounding figurines are attackers
+						bool emptySurroundingsK = board[i][k - 1] != 'E'; //Checks if surroundings on the k axis are empty
+						bool emptySurroundingsI = board[i - 1][k] != 'E'; //Checks if surroundings on the i axis are empty
 
-					bool combinedChecksI = surroundI && figurineIsKing && figurineIsNotSame;
-					bool combinedChecksK = surroundK && figurineIsKing && figurineIsNotSame;
-					if (combinedChecksI && emptySurroundingsI)
-						Win();
+						bool combinedChecksI = surroundI && figurineIsNotDef;
+						bool combinedChecksK = surroundK && figurineIsNotDef;
+						if (combinedChecksI && emptySurroundingsI)
+							Win('A');
 
-					if (combinedChecksI && emptySurroundingsK)
-						Win();
-
-					if (combinedChecksK && emptySurroundingsI)
-						Win();
-
-					if (combinedChecksK && emptySurroundingsK)
-						Win();
+						if (combinedChecksK && emptySurroundingsK)
+							Win('A');
+					}
 				}
 			}
 		}
@@ -505,14 +558,17 @@ void IsKingCaptured()//Checks if the king has two other figurines (or an X and a
 
 void RemoveFigurine(char x, char y) //Removes a figurine at the given coordinates
 {
-	cout << "\nFigurine on coordinates " << x << ", " << y << " with symbol " << board[x][y] << " has been taken!";
+	char character = board[x][y];
 	board[x][y] = 'E';
-	if (board[x][y] == 'A')
+
+	cout << "\nFigurine on coordinates " << (char)x << ", " << (char)y << " with symbol " << character << " has been taken!";
+
+	if (character == 'A')
 	{
 		attCount--;
 		attDeadCount++;
 	}
-	if (board[x][y] == 'D')
+	if (character == 'D')
 	{
 		defCount--;
 		defDeadCount++;
@@ -525,7 +581,7 @@ void IsFigurineCaptured() //Checks if any figurine has two other figurines (or a
 	{
 		for (int k = 0; k < preset; k++)
 		{
-			bool figurineIsNotEmptyOrSafe = board[i][k] != 'E' || board[i][k] == 'X'; //Checks if the figurine being taken is empty or safe space
+			bool figurineIsNotEmptyOrSafe = !(board[i][k] == 'E' || board[i][k] == 'X'); //Checks if the figurine being taken is empty or safe space
 			bool figurineIsNotKing = board[i][k] != 'K';
 			if (figurineIsNotEmptyOrSafe && figurineIsNotKing)
 			{
@@ -533,7 +589,14 @@ void IsFigurineCaptured() //Checks if any figurine has two other figurines (or a
 				{
 					bool surroundI = board[i][k - 1] == board[i][k + 1] || board[i][k - 1] == 'X' || board[i][k + 1] == 'X'; //Checks if a figurine is surrounded
 					bool emptySurroundings = board[i][k - 1] != 'E'; //Checks if the surroundings are empty
-					bool figurineIsNotSame = board[i][k] != board[i][k - 1]; //Checks if figurine is not the same as the surrounding ones
+					bool figurineIsNotSame = board[i][k] != board[i][k - 1] && board[i][k] != board[i][k + 1]; //Checks if figurine is not the same as the surrounding ones
+
+
+					if (board[i][k] == 'D')
+					{
+						surroundI = surroundI && !(board[i][k - 1] == 'K' || board[i][k + 1] == 'K');
+					}
+
 					if (surroundI && emptySurroundings && figurineIsNotSame)
 					{
 						RemoveFigurine(i, k);
@@ -545,7 +608,13 @@ void IsFigurineCaptured() //Checks if any figurine has two other figurines (or a
 					{
 						bool surroundK = board[i - 1][k] == board[i + 1][k] || board[i - 1][k] == 'X' || board[i + 1][k] == 'X'; //Checks if a figurine is surrounded
 						bool emptySurroundings = board[i + 1][k] != 'E'; //Checks if the surroundings are empty
-						bool figurineIsNotSame = board[i][k] != board[i + 1][k]; //Checks if figurine is not the same as the surrounding ones
+						bool figurineIsNotSame = board[i][k] != board[i + 1][k] && board[i][k] != board[i - 1][k]; //Checks if figurine is not the same as the surrounding ones
+
+
+						if (board[i][k] == 'D')
+						{
+							surroundK = surroundK && !(board[i - 1][k] == 'K' || board[i + 1][k] == 'K');
+						}
 						if (surroundK && emptySurroundings && figurineIsNotSame)
 						{
 							RemoveFigurine(i, k);
@@ -555,19 +624,19 @@ void IsFigurineCaptured() //Checks if any figurine has two other figurines (or a
 					{
 						bool surroundI = board[i - 1][k] == board[i + 1][k] || board[i - 1][k] == 'X' || board[i + 1][k] == 'X'; //Checks if a figurine is surrounded on the i axis
 						bool surroundK = board[i][k - 1] == board[i][k + 1] || board[i][k - 1] == 'X' || board[i][k + 1] == 'X'; //Checks if a figurine is surrounded on the k axis
-						bool figurineIsNotSame = board[i][k] != board[i + 1][k] || board[i][k] != board[i][k - 1]; //Checks if figurine is not the same as the surrounding ones
+						bool figurineIsNotSame = (board[i][k] != board[i + 1][k] && board[i][k] != board[i - 1][k]) || board[i][k] != (board[i][k - 1] && board[i][k] != board[i][k + 1]); //Checks if figurine is not the same as the surrounding ones
 						bool emptySurroundingsK = board[i][k - 1] != 'E'; //Checks if surroundings on the k axis are empty
 						bool emptySurroundingsI = board[i - 1][k] != 'E'; //Checks if surroundings on the i axis are empty
 
+
+						if (board[i][k] == 'D')
+						{
+							surroundI = surroundI && !(board[i][k - 1] == 'K' || board[i][k + 1] == 'K');
+							surroundK = surroundK && !(board[i - 1][k] == 'K' || board[i + 1][k] == 'K');
+						}
 						bool combinedChecksI = surroundI && figurineIsNotSame;
 						bool combinedChecksK = surroundK && figurineIsNotSame;
 						if (combinedChecksI && emptySurroundingsI)
-							RemoveFigurine(i, k);
-
-						if (combinedChecksI && emptySurroundingsK)
-							RemoveFigurine(i, k);
-
-						if (combinedChecksK && emptySurroundingsI)
 							RemoveFigurine(i, k);
 
 						if (combinedChecksK && emptySurroundingsK)
@@ -588,9 +657,9 @@ void Move(char x1, char y1, char x2, char y2) // Makes the move chosen by the pl
 
 	if (IsMoveLegal(x1, y1, x2, y2))
 	{
-		board[trueX2][trueY2] = board[trueX1][trueY1];
-		board[trueX1][trueY1] = 'E';
-		SaveMove(x1, y1, x2, y2);
+		SaveMove();
+		board[trueY2][trueX2] = board[trueY1][trueX1];
+		board[trueY1][trueX1] = 'E';
 		moves++;
 		IsFigurineCaptured();
 		IsKingCaptured();
@@ -608,14 +677,28 @@ void Move(char x1, char y1, char x2, char y2) // Makes the move chosen by the pl
 void Back() //Turns back one move
 {
 	turn = !turn;
-	if (turn)
+	moves--;
+	if (!turn)
 	{
-		Move(PreviousDefMove[2], PreviousDefMove[3], PreviousDefMove[0], PreviousDefMove[1]);
+		for (int i = 0; i < preset; i++)
+		{
+			for (int k = 0; k < preset; k++)
+			{
+				board[i][k] = boardDef[i][k];
+			}
+		}
 	}
 	else
 	{
-		Move(PreviousAttMove[2], PreviousAttMove[3], PreviousAttMove[0], PreviousAttMove[1]);
+		for (int i = 0; i < preset; i++)
+		{
+			for (int k = 0; k < preset; k++)
+			{
+				board[i][k] = boardAtt[i][k];
+			}
+		}
 	}
+	PrintBoard();
 }
 
 void Rules() //Prints the rules of the game
@@ -685,6 +768,20 @@ int main()
 	}
 	PrintBoard();
 
+	cout << "Choose who will start first (A/D): ";
+	char toStart; cin >> toStart;
+	do {
+		switch (toStart)
+		{
+		case 'A': turn = false; break;
+		case 'D': turn = true; break;
+		default: cout << "Choose who will start first (A/D): ";
+			char toStart; cin >> toStart;
+			break;
+		}
+	} while (toStart != 'A' && toStart != 'D');
+
+
 	char input[maxInputLength];
 
 	while (!gameEnd)
@@ -697,6 +794,8 @@ int main()
 		char currentWord[maxWordLength];
 		int wordIndex = 0;
 		int wordCount = 0;
+
+
 
 		for (int i = 0; ; ++i) {
 			if (input[i] == ' ' || input[i] == '\0') {
@@ -721,14 +820,23 @@ int main()
 				currentWord[wordIndex++] = input[i];
 			}
 		}
-
 		if (strcmp(words[0], "Move") == 0) {
-			Move(words[1][0], words[2][0], words[3][0], words[4][0]);
+			for (int i = 1; i < sizeof(words); i++)
+				if (((int)(words[i] - '1') >= 0 && (int)(words[i] - '1') < preset) || ((int)(words[i] - 'A') >= 0 && (int)(words[i] - 'A') < preset))
+				{
+					Move(words[1][0], words[2][0], words[3][0], words[4][0]);
+					PrintBoard();
+				}
+				else
+				{
+					cout << "Incorrect syntax!";
+				}
 		}
 		else
 		{
 			if (strcmp(words[0], "Back") == 0) {
 				Back();
+				PrintBoard();
 			}
 			else {
 				if (strcmp(words[0], "Quit") == 0) {
@@ -747,19 +855,25 @@ int main()
 								Rules();
 							}
 							else {
-								cout << "\nInvalid command!\n";
+								if (sizeof(words) <= 0)
+									cout << "\nInvalid command!\n";
 							}
 						}
 					}
 				}
 			}
 		}
-
+		cout << "\nPress any key to continue...";
+		char emptyKey = getchar();
 
 	}
 	for (int i = 0; i < preset; i++)
 	{
 		delete[] board[i];
+		delete[] boardDef[i];
+		delete[] boardAtt[i];
 	}
 	delete[] board;
+	delete[] boardDef;
+	delete[] boardAtt;
 }
