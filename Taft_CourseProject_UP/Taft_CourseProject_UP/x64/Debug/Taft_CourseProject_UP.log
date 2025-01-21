@@ -1,13 +1,5 @@
 ﻿  Taft_CourseProject_UP.cpp
-C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(509,23): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(509,31): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(827,10): warning C4311: 'type cast': pointer truncation from 'char *' to 'int'
-C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(827,10): warning C4302: 'type cast': truncation from 'char *' to 'int'
-C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(827,40): warning C4311: 'type cast': pointer truncation from 'char *' to 'int'
-C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(827,40): warning C4302: 'type cast': truncation from 'char *' to 'int'
-C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(827,76): warning C4311: 'type cast': pointer truncation from 'char *' to 'int'
-C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(827,76): warning C4302: 'type cast': truncation from 'char *' to 'int'
-C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(827,106): warning C4311: 'type cast': pointer truncation from 'char *' to 'int'
-C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(827,106): warning C4302: 'type cast': truncation from 'char *' to 'int'
-C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(493,1): warning C4715: 'IsMoveLegal': not all control paths return a value
+C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(504,23): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
+C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(504,31): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
+C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\Taft_CourseProject_UP\Taft_CourseProject_UP.cpp(488,1): warning C4715: 'IsMoveLegal': not all control paths return a value
   Taft_CourseProject_UP.vcxproj -> C:\Users\44740\Documents\GitHub\Tafl\Taft_CourseProject_UP\x64\Debug\Taft_CourseProject_UP.exe
