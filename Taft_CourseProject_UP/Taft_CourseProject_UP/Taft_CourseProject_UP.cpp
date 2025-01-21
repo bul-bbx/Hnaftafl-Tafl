@@ -1,7 +1,8 @@
-//Veliko Velikov 8MI0600548
+// Veliko Velikov 8MI0600548
 
 #include <iostream>
 #include <iomanip>
+//#include <cstring>
 
 using namespace std;
 
@@ -9,29 +10,28 @@ int const maxInputLength = 15;
 int const maxWordLength = 6;
 int const maxWords = 5;
 
+int const maxSize = 13; // The maximal size that the board can be
+int const minSize = 7; // The minimal size that the board can be
 
-int const maxSize = 13; //The maximal size that the board can be
-int const minSize = 7; //The minimal size that the board can be
-
-int preset = 0; //The size that the board is
-bool turn = 1; //1 - Defenders, 0 - Attackers
-int moves = 0; //Moves taken so far
-int defCount = 0; //The count of the Defenders' figures
-int defDeadCount = 0; //The count of the dead Defenders' figures
-int attCount = 0; //The count of the Attackers' figures
-int attDeadCount = 0; //The count of the dead Attackers' figures
+int preset = 0; // The size that the board is
+char turn = 'N'; // 1 - Defenders, 0 - Attackers
+int moves = 0; // Moves taken so far
+int defCount = 0; // The count of the Defenders' figures
+int defDeadCount = 0; // The count of the dead Defenders' figures
+int attCount = 0; // The count of the Attackers' figures
+int attDeadCount = 0; // The count of the dead Attackers' figures
 bool gameEnd = false;
 
-char** board = new char* [preset];
-char** boardDef = new char* [preset];
-char** boardAtt = new char* [preset];
+char** board = nullptr;
+char** boardDef = nullptr;
+char** boardAtt = nullptr;
 
-void Clear() //Clears the console and sets the cursor on the top left space
+void Clear() // Clears the console and sets the cursor on the top left space
 {
 	cout << "\x1B[2J\x1B[H";
 }
 
-void Win(char character) //Prints the Win Screen
+void Win(char character) // Prints the Win Screen
 {
 	Clear();
 	cout << "========================\n";
@@ -57,6 +57,8 @@ void Win(char character) //Prints the Win Screen
 
 void CountFigurines() // Counts the amount of every figurine there is
 {
+	attCount = 0;
+	defCount = 0;
 	for (int i = 0; i < preset; i++)
 	{
 		for (int k = 0; k < preset; k++)
@@ -75,19 +77,18 @@ void PrintBoard() // Prints the board
 	cout << "  | ";
 	for (int i = 0; i < preset; i++)
 	{
-		cout << (char)('A' + i) << " "; //Sets the top orienting row (the letters for the spaces)
+		cout << (char)('A' + i) << " "; // Sets the top orienting row (the letters for the spaces)
 	}
 	cout << "| " << endl;
 	for (int i = 0; i < 2 * (preset + 4) - 1; i++)
-		cout << "-"; //Sets the divisor between the orienting row and the board
+		cout << "-"; // Sets the divisor between the orienting row and the board
 	cout << endl;
 
 	for (int i = 0; i < preset; i++)
 	{
-		cout << setw(2) << i + 1 << "| "; //Sets the left most orienting column (the numbers for the spaces)
+		cout << setw(2) << i + 1 << "| "; // Sets the left most orienting column (the numbers for the spaces)
 		for (int k = 0; k < preset; k++)
 		{
-
 			switch (board[i][k])
 			{
 			case 'E': cout << "· "; break;
@@ -96,32 +97,27 @@ void PrintBoard() // Prints the board
 			case 'K': cout << "K "; break;
 			case 'X': cout << "X "; break;
 			}
-
 		}
-		cout << "|" << i + 1; //Sets the right most orienting column (the numbers for the spaces)
+		cout << "|" << i + 1; // Sets the right most orienting column (the numbers for the spaces)
 		cout << endl;
 	}
 
 	for (int i = 0; i < 2 * (preset + 4) - 1; i++)
-		cout << "-"; //Sets the divisor between the orienting row and the board
+		cout << "-"; // Sets the divisor between the orienting row and the board
 
 	cout << endl << "  | ";
 	for (int i = 0; i < preset; i++)
 	{
-		cout << (char)('A' + i) << " "; //Sets the top orienting row (the letters for the spaces)
+		cout << (char)('A' + i) << " "; // Sets the top orienting row (the letters for the spaces)
 	}
 	cout << "| " << endl;
 
 	cout << endl;
-	cout << endl;
-	cout << endl;
-	if (turn)
+	if (turn == 'D')
 		cout << "Defenders to move!";
-	else
+	if (turn == 'A')
 		cout << "Attackers to move!";
-
-	cout << endl;
-	cout << endl;
+	cout << endl << endl;
 }
 
 void setup7x7() // Sets up the board on a 7x7 preset
@@ -332,26 +328,20 @@ void setup13x13() // Sets up the board on a 13x13 preset
 	board[0][preset - 1] = 'X';
 }
 
-bool InitializeBoard(bool check) //Sets up the board and makes sure that the parameters given are correct
+bool InitializeBoard() // Sets up the board and makes sure that the parameters given are correct
 {
 	Clear();
 	bool numericCheck = preset % 2 == 1 && preset >= minSize && preset <= maxSize;
-	if (numericCheck || preset == 0 || preset == ' ')
+	if (numericCheck)
 	{
 		board = new char* [preset];
 		boardDef = new char* [preset];
 		boardAtt = new char* [preset];
-		;		for (int i = 0; i < preset; i++)
+		for (int i = 0; i < preset; i++)
 		{
 			board[i] = new char[preset];
 			boardDef[i] = new char[preset];
 			boardAtt[i] = new char[preset];
-			for (int k = 0; k < preset; k++)
-			{
-				board[i][k] = '0';
-				boardDef[i][k] = '0';
-				boardAtt[i][k] = '0';
-			}
 		}
 		switch (preset)
 		{
@@ -359,9 +349,9 @@ bool InitializeBoard(bool check) //Sets up the board and makes sure that the par
 		case 9: setup9x9(); break;
 		case 11: setup11x11(); break;
 		case 13: setup13x13(); break;
-		default: setup11x11(); break; //if a preset is not chosen the game sets up the traditional board size which is 11x11
+		default: setup11x11(); break;
 		}
-		check = true;
+		return true;
 	}
 	else
 	{
@@ -369,13 +359,11 @@ bool InitializeBoard(bool check) //Sets up the board and makes sure that the par
 		cout << "Choose a setup (use the number in the brackets):" <<
 			"\n7x7(7)" <<
 			"\n9x9(9)" <<
-			"\n9x9(9)" <<
 			"\n11x11(11)" <<
-			"\n13x13(13)" <<
-			"\nEnter(use the number in the brackets):";
+			"\n13x13(13)" << endl;
 		cin >> preset;
+		return false;
 	}
-	return check;
 }
 
 void SaveMove() //Saves the coordinated of the change of the last movement
@@ -402,13 +390,20 @@ void SaveMove() //Saves the coordinated of the change of the last movement
 	}
 }
 
-bool IsMoveLegal(char x1, char y1, char x2, char y2) //Checks if the move is along the rules or not
+bool IsMoveLegal(char x1, char* y1, char x2, char* y2) //Checks if the move is along the rules or not
 {
 
+	int trueY1, trueY2;
 	int trueX1 = (int)(x1 - 'A');
-	int trueY1 = (int)(y1 - '1');
+	if (strlen(y1) > 1)
+		trueY1 = (int)(y1[0] - '0') * 10 + (int)(y1[1] - '1');
+	else
+		trueY1 = (int)(y1[0] - '1');
 	int trueX2 = (int)(x2 - 'A');
-	int trueY2 = (int)(y2 - '1');
+	if (strlen(y2) > 1)
+		trueY2 = (int)(y2[0] - '0') * 10 + (int)(y2[1] - '1');
+	else
+		trueY2 = (int)(y2[0] - '1');
 
 	bool x1Correct = trueX1 >= 0 && trueX1 <= preset - 1;
 	bool y1Correct = trueY1 >= 0 && trueY1 <= preset - 1;
@@ -424,18 +419,18 @@ bool IsMoveLegal(char x1, char y1, char x2, char y2) //Checks if the move is alo
 	bool yAxis = trueY1 == trueY2;
 	if (xAxis ^ yAxis)
 	{
-		if (xAxis)
+		if (yAxis)
 		{
 			if (trueX1 < trueX2)
 				for (int i = trueX1; i < trueX2; i++)
 				{
-					if (board[trueY1][i] != 'E')
+					if (board[trueY1 + 1][i] != 'E')
 					{
 						return false;
 					}
 				}
 			else
-				for (int i = trueX2; i < trueX1; i++)
+				for (int i = trueX2 + 1; i < trueX1; i++)
 				{
 					if (board[trueY1][i] != 'E')
 					{
@@ -446,7 +441,7 @@ bool IsMoveLegal(char x1, char y1, char x2, char y2) //Checks if the move is alo
 		else
 		{
 			if (trueY1 < trueY2)
-				for (int i = trueY1; i < trueY2; i++)
+				for (int i = trueY1 + 1; i < trueY2; i++)
 				{
 					if (board[i][trueX1] != 'E')
 					{
@@ -454,7 +449,7 @@ bool IsMoveLegal(char x1, char y1, char x2, char y2) //Checks if the move is alo
 					}
 				}
 			else
-				for (int i = trueY2; i < trueY1; i++)
+				for (int i = trueY2 + 1; i < trueY1; i++)
 				{
 					if (board[i][trueX1] != 'E')
 					{
@@ -483,7 +478,7 @@ bool IsMoveLegal(char x1, char y1, char x2, char y2) //Checks if the move is alo
 		}
 		else
 		{
-			if (board[trueY1][trueX1] == 'A' && xAxis ^ yAxis && board[trueY2][trueX2])
+			if (board[trueY1][trueX1] == 'A' && xAxis ^ yAxis && board[trueY2][trueX2] == 'E')
 				return true;
 			else
 				return false;
@@ -558,12 +553,27 @@ void IsKingCaptured()//Checks if the king has two other figurines (or an X and a
 	}
 }
 
-void RemoveFigurine(char x, char y) //Removes a figurine at the given coordinates
+void RemoveFigurine(int x, int y) //Removes a figurine at the given coordinates
 {
+	char trueYarr[2];
+	char trueY;
+	char trueX = (char)(x + 'A');
+	if (y > 9)
+	{
+		trueYarr[0] = (char)(y / 10 + '1');
+		trueYarr[1] = (char)(y % 10 + '1');
+	}
+	else
+		trueY = y + '1';
 	char character = board[x][y];
 	board[x][y] = 'E';
 
-	cout << "\nFigurine on coordinates " << (char)x << ", " << (char)y << " with symbol " << character << " has been taken!";
+	if (y > 9)
+	{
+		cout << "\nFigurine on coordinates " << trueX << ", " << trueYarr[0] << trueYarr[1] << " with symbol " << character << " has been taken!";
+	}
+	else
+		cout << "\nFigurine on coordinates " << trueX << ", " << trueY << " with symbol " << character << " has been taken!";
 
 	if (character == 'A')
 	{
@@ -591,7 +601,7 @@ void IsFigurineCaptured() //Checks if any figurine has two other figurines (or a
 				{
 					bool surroundI = board[i][k - 1] == board[i][k + 1] || board[i][k - 1] == 'X' || board[i][k + 1] == 'X'; //Checks if a figurine is surrounded
 					bool emptySurroundings = board[i][k - 1] != 'E'; //Checks if the surroundings are empty
-					bool figurineIsNotSame = board[i][k] != board[i][k - 1] && board[i][k] != board[i][k + 1]; //Checks if figurine is not the same as the surrounding ones
+					bool figurineIsNotSame = board[i][k] != board[i][k - 1] || board[i][k] != board[i][k + 1]; //Checks if figurine is not the same as the surrounding ones
 
 
 					if (board[i][k] == 'D')
@@ -610,7 +620,7 @@ void IsFigurineCaptured() //Checks if any figurine has two other figurines (or a
 					{
 						bool surroundK = board[i - 1][k] == board[i + 1][k] || board[i - 1][k] == 'X' || board[i + 1][k] == 'X'; //Checks if a figurine is surrounded
 						bool emptySurroundings = board[i + 1][k] != 'E'; //Checks if the surroundings are empty
-						bool figurineIsNotSame = board[i][k] != board[i + 1][k] && board[i][k] != board[i - 1][k]; //Checks if figurine is not the same as the surrounding ones
+						bool figurineIsNotSame = board[i][k] != board[i + 1][k] || board[i][k] != board[i - 1][k]; //Checks if figurine is not the same as the surrounding ones
 
 
 						if (board[i][k] == 'D')
@@ -626,9 +636,9 @@ void IsFigurineCaptured() //Checks if any figurine has two other figurines (or a
 					{
 						bool surroundI = board[i - 1][k] == board[i + 1][k] || board[i - 1][k] == 'X' || board[i + 1][k] == 'X'; //Checks if a figurine is surrounded on the i axis
 						bool surroundK = board[i][k - 1] == board[i][k + 1] || board[i][k - 1] == 'X' || board[i][k + 1] == 'X'; //Checks if a figurine is surrounded on the k axis
-						bool figurineIsNotSame = (board[i][k] != board[i + 1][k] && board[i][k] != board[i - 1][k]) || board[i][k] != (board[i][k - 1] && board[i][k] != board[i][k + 1]); //Checks if figurine is not the same as the surrounding ones
-						bool emptySurroundingsK = board[i][k - 1] != 'E'; //Checks if surroundings on the k axis are empty
-						bool emptySurroundingsI = board[i - 1][k] != 'E'; //Checks if surroundings on the i axis are empty
+						bool figurineIsNotSame = (board[i][k] != board[i + 1][k] || board[i][k] != board[i - 1][k]) && (board[i][k] != board[i][k - 1] || board[i][k] != board[i][k + 1]); //Checks if figurine is not the same as the surrounding ones
+						bool emptySurroundingsK = board[i][k - 1] != 'E' || board[i][k + 1] != 'E'; //Checks if surroundings on the k axis are empty
+						bool emptySurroundingsI = board[i - 1][k] != 'E' || board[i + 1][k] != 'E'; //Checks if surroundings on the i axis are empty
 
 
 						if (board[i][k] == 'D')
@@ -650,30 +660,43 @@ void IsFigurineCaptured() //Checks if any figurine has two other figurines (or a
 	}
 }
 
-void Move(char x1, char y1, char x2, char y2) // Makes the move chosen by the player if it is legal
+void Move(char x1, char* y1, char x2, char* y2) // Makes the move chosen by the player if it is legal
 {
+	int trueY1, trueY2;
 	int trueX1 = (int)(x1 - 'A');
-	int trueY1 = (int)(y1 - '1');
+	if (strlen(y1) > 1)
+		trueY1 = (int)(y1[0] - '0') * 10 + (int)(y1[1] - '1');
+	else
+		trueY1 = (int)(y1[0] - '1');
 	int trueX2 = (int)(x2 - 'A');
-	int trueY2 = (int)(y2 - '1');
+	if (strlen(y2) > 1)
+		trueY2 = (int)(y2[0] - '0') * 10 + (int)(y2[1] - '1');
+	else
+		trueY2 = (int)(y2[0] - '1');
 
 	if (IsMoveLegal(x1, y1, x2, y2))
 	{
 		SaveMove();
-		board[trueY2][trueX2] = board[trueY1][trueX1];
-		board[trueY1][trueX1] = 'E';
+		if (trueY1 == preset / 2 && trueX1 == preset / 2)
+		{
+			board[trueY2][trueX2] = board[trueY1][trueX1];
+			board[trueY1][trueX1] = 'X';
+		}
+		else
+		{
+			board[trueY2][trueX2] = board[trueY1][trueX1];
+			board[trueY1][trueX1] = 'E';
+		}
 		moves++;
 		IsFigurineCaptured();
 		IsKingCaptured();
 		IsKingOnX();
-
 		turn = !turn;
 	}
 	else
 	{
 		cout << "Choose a valid move!";
 	}
-
 }
 
 void Back() //Turns back one move
@@ -761,114 +784,66 @@ int main()
 		"\n9x9(9)" <<
 		"\n11x11(11)" <<
 		"\n13x13(13)" <<
-		"\nEnter(use the number in the brackets):";
+		"\nEnter a preset:" << endl;
 	cin >> preset;
-	bool check = false;
-	while (!check)
-	{
-		check = InitializeBoard(check);
-	}
+
+	while (!InitializeBoard()); // Loop until the board is initialized correctly
+
 	PrintBoard();
 
 	cout << "Choose who will start first (A/D): ";
-	char toStart; cin >> toStart;
-	do {
-		switch (toStart)
-		{
-		case 'A': turn = false; break;
-		case 'D': turn = true; break;
-		default: cout << "Choose who will start first (A/D): ";
-			char toStart; cin >> toStart;
-			break;
-		}
-	} while (toStart != 'A' && toStart != 'D');
-
+	char toStart;
+	cin >> toStart;
+	while (toStart != 'A' && toStart != 'D') {
+		cout << "Choose who will start first (A/D): ";
+		cin >> toStart;
+	}
+	turn = toStart;
 
 	char input[maxInputLength];
-
-	while (!gameEnd)
-	{
-
+	while (!gameEnd) {
 		PrintBoard();
 		cout << "\nEnter a command (Write 'Help' for commands):\n";
+
 		cin.getline(input, maxInputLength);
 		char words[maxWords][maxWordLength];
-		char currentWord[maxWordLength];
-		int wordIndex = 0;
 		int wordCount = 0;
 
-
-
-		for (int i = 0; ; ++i) {
-			if (input[i] == ' ' || input[i] == '\0') {
-				if (wordIndex > 0) {
-					currentWord[wordIndex] = '\0';
-
-					int j = 0;
-					while (currentWord[j] != '\0') {
-						words[wordCount][j] = currentWord[j];
-						j++;
-					}
-					words[wordCount][j] = '\0';
-					wordCount++;
-
-					wordIndex = 0;
-				}
-				if (input[i] == '\0') {
-					break;
-				}
-			}
-			else {
-				currentWord[wordIndex++] = input[i];
-			}
+		char* context;
+		char* token = strtok_s(input, " ", &context);
+		while (token != nullptr && wordCount < maxWords) {
+			strncpy_s(words[wordCount], maxWordLength, token, _TRUNCATE);
+			words[wordCount][maxWordLength - 1] = '\0'; // Null-terminate
+			wordCount++;
+			token = strtok_s(nullptr, " ", &context);
 		}
-		if (strcmp(words[0], "Move") == 0) {
-			for (int i = 1; i < sizeof(words); i++)
-				if (((int)(words[i] - '1') >= 0 && (int)(words[i] - '1') < preset) || ((int)(words[i] - 'A') >= 0 && (int)(words[i] - 'A') < preset))
-				{
-					Move(words[1][0], words[2][0], words[3][0], words[4][0]);
-					PrintBoard();
-				}
-				else
-				{
-					cout << "Incorrect syntax!";
-				}
+
+		if (strcmp(words[0], "Move") == 0 && wordCount == 5) {
+			Move(words[1][0], words[2], words[3][0], words[4]);
 		}
-		else
-		{
-			if (strcmp(words[0], "Back") == 0) {
-				Back();
-				PrintBoard();
-			}
-			else {
-				if (strcmp(words[0], "Quit") == 0) {
-					Quit();
-				}
-				else {
-					if (strcmp(words[0], "Info") == 0) {
-						Info();
-					}
-					else {
-						if (strcmp(words[0], "Help") == 0) {
-							Help();
-						}
-						else {
-							if (strcmp(words[0], "Rules") == 0) {
-								Rules();
-							}
-							else {
-								if (sizeof(words) <= 0)
-									cout << "\nInvalid command!\n";
-							}
-						}
-					}
-				}
-			}
+		else if (strcmp(words[0], "Back") == 0) {
+			Back();
+		}
+		else if (strcmp(words[0], "Quit") == 0) {
+			Quit();
+		}
+		else if (strcmp(words[0], "Info") == 0) {
+			Info();
+		}
+		else if (strcmp(words[0], "Help") == 0) {
+			Help();
+		}
+		else if (strcmp(words[0], "Rules") == 0) {
+			Rules();
+		}
+		else {
+			if (strlen(words[0]) <= 0)
+				cout << "\nInvalid command!\n";
 		}
 		cout << "\nPress any key to continue...";
-		char emptyKey = getchar();
-
+		getchar(); // Wait for user input
 	}
+
 	for (int i = 0; i < preset; i++)
 	{
 		delete[] board[i];
@@ -878,4 +853,6 @@ int main()
 	delete[] board;
 	delete[] boardDef;
 	delete[] boardAtt;
+
+	return 0;
 }
