@@ -368,7 +368,7 @@ bool InitializeBoard() // Sets up the board and makes sure that the parameters g
 
 void SaveMove() //Saves the coordinated of the change of the last movement
 {
-	if (!turn)
+	if (turn == 'D')
 	{
 		for (int i = 0; i < preset; i++)
 		{
@@ -457,7 +457,7 @@ bool IsMoveLegal(char x1, char* y1, char x2, char* y2) //Checks if the move is a
 					}
 				}
 		}
-		if (turn)
+		if (turn == 'D')
 		{
 			if (board[trueY1][trueX1] == 'D' && board[trueY2][trueX2] == 'E' && xAxis ^ yAxis)
 			{
