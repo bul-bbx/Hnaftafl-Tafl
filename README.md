@@ -8,3 +8,5 @@
 18.01.2025 18:00 | Initialized all the functions, there are some logic malfunctions, will fix them in the next commit.
 
 19.01.2025 18:09 | Did some debugging, fixed some bugs, updated the logic, made the save move function better.
+
+21.01.2025 17:16 | Did the latest debugging and fixed some logical bugs. The project runs good.
