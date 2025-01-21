@@ -701,7 +701,11 @@ void Move(char x1, char* y1, char x2, char* y2) // Makes the move chosen by the 
 
 void Back() //Turns back one move
 {
-	turn = !turn;
+	if (turn == 'D')
+		turn = 'A';
+	else 
+		if (turn == 'A')
+			turn = 'D';;
 	moves--;
 	if (!turn)
 	{
