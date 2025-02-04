@@ -96,6 +96,24 @@ void PrintBoard() // Prints the board
 	cout << endl << endl;
 }
 
+void Info() // Writes the info about the game situation(Player on turn, Number of figurines, Takes figurines, Number of moves taken so far)
+{
+	cout << "\nDefenders: " <<
+		"\nAlive - " << defCount <<
+		"\nDead - " << defDeadCount <<
+		"\nAttackers: " <<
+		"\nAlive - " << attCount <<
+		"\nDead - " << attDeadCount;
+	if (!gameEnd)
+	{
+		if (turn == 'D')
+			cout << "\n\nDefenders turn";
+		else
+			cout << "\n\nAttackers turn";
+	}
+	cout << "\n\nMoves conducted - " << moves;
+}
+
 void Win(char character) // Prints the Win Screen
 {
 	Clear();
@@ -119,7 +137,10 @@ void Win(char character) // Prints the Win Screen
 	{
 		cout << "The king escaped! The kingdom will prevail!";
 	}
+
 	gameEnd = true;
+
+	Info();
 }
 
 void setup7x7() // Sets up the board on a 7x7 preset
@@ -501,7 +522,7 @@ void IsKingOnX() // Checks if the king is on one of the corners and if he is it 
 	bool isOnTopRight = board[preset - 1][0] == 'K';
 	bool isOnBottomLeft = board[0][preset - 1] == 'K';
 	bool isOnBottomRight = board[preset - 1][preset - 1] == 'K';
-	if (isOnTopLeft && isOnTopRight && isOnBottomLeft && isOnBottomRight)
+	if (isOnTopLeft || isOnTopRight || isOnBottomLeft || isOnBottomRight)
 	{
 		Win('D');
 	}
@@ -617,7 +638,7 @@ void IsFigurineCaptured() //Checks if any figurine has two other figurines (or a
 					}
 					else
 					{
-						surroundI = surroundI && (board[i][k - 1] == 'K' || board[i][k + 1] == 'K');
+						surroundI = surroundI || (board[i][k - 1] == 'K' && board[i][k + 1] == 'D') || (board[i][k + 1] == 'K' && board[i][k - 1] == 'D');
 					}
 
 					if (surroundI && emptySurroundings && figurineIsNotSame)
@@ -640,7 +661,7 @@ void IsFigurineCaptured() //Checks if any figurine has two other figurines (or a
 						}
 						else
 						{
-							surroundK = surroundK && (board[i - 1][k] == 'K' || board[i + 1][k] == 'K');
+							surroundK = surroundK || (board[i - 1][k] == 'K' && board[i + 1][k] == 'D') || (board[i + 1][k] == 'K' && board[i - 1][k] == 'D');
 						}
 
 						if (surroundK && emptySurroundings && figurineIsNotSame)
@@ -652,7 +673,7 @@ void IsFigurineCaptured() //Checks if any figurine has two other figurines (or a
 					{
 						bool surroundI = board[i - 1][k] == board[i + 1][k] || board[i - 1][k] == 'X' || board[i + 1][k] == 'X'; //Checks if a figurine is surrounded on the i axis
 						bool surroundK = board[i][k - 1] == board[i][k + 1] || board[i][k - 1] == 'X' || board[i][k + 1] == 'X'; //Checks if a figurine is surrounded on the k axis
-						bool figurineIsNotSame = (board[i][k] != board[i + 1][k] || board[i][k] != board[i - 1][k]) && (board[i][k] != board[i][k - 1] || board[i][k] != board[i][k + 1]); //Checks if figurine is not the same as the surrounding ones
+						bool figurineIsNotSame = (board[i][k] != board[i + 1][k] && board[i][k] != board[i - 1][k]) && (board[i][k] != board[i][k - 1] && board[i][k] != board[i][k + 1]); //Checks if figurine is not the same as the surrounding ones
 						bool emptySurroundingsK = board[i][k - 1] != 'E' || board[i][k + 1] != 'E'; //Checks if surroundings on the k axis are empty
 						bool emptySurroundingsI = board[i + 1][k] != 'E' || board[i - 1][k] != 'E'; //Checks if surroundings on the i axis are empty
 
@@ -664,8 +685,8 @@ void IsFigurineCaptured() //Checks if any figurine has two other figurines (or a
 						}
 						else
 						{
-							surroundI = surroundI && (board[i][k - 1] == 'K' || board[i][k + 1] == 'K');
-							surroundK = surroundK && (board[i - 1][k] == 'K' || board[i + 1][k] == 'K');
+							surroundI = surroundI || (board[i][k - 1] == 'K' && board[i][k + 1] == 'D') || (board[i][k + 1] == 'K' && board[i][k - 1] == 'D');
+							surroundK = surroundK || (board[i - 1][k] == 'K' && board[i + 1][k] == 'D') || (board[i + 1][k] == 'K' && board[i - 1][k] == 'D');
 						}
 
 						bool combinedChecksI = surroundI && figurineIsNotSame;
@@ -770,24 +791,6 @@ void Rules() //Prints the rules of the game
 		"3. Winning\n" <<
 		" - Attackers win by capturing the king.\n" <<
 		" - Defenders win if the king escapes to a corner.";
-}
-
-void Info() // Writes the info about the game situation(Player on turn, Number of figurines, Takes figurines, Number of moves taken so far)
-{
-	cout << "\nDefenders: " <<
-		"\nAlive - " << defCount <<
-		"\nDead - " << defDeadCount <<
-		"\nAttackers: " <<
-		"\nAlive - " << attCount <<
-		"\nDead - " << attDeadCount;
-	if (!gameEnd)
-	{
-		if (turn)
-			cout << "\n\nDefenders turn";
-		else
-			cout << "\n\nAttackers turn";
-	}
-	cout << "\n\nMoves conducted - " << moves;
 }
 
 void Help() // Gives a list with the possible commands
