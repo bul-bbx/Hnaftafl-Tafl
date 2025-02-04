@@ -596,9 +596,9 @@ void RemoveFigurine(int y, int x) //Removes a figurine at the given coordinates
 
 void IsFigurineCaptured() //Checks if any figurine has two other figurines (or an X and a figurine) on opposite sides
 {
-	for (int i = 5; i < preset; i++)
+	for (int i = 0; i < preset; i++)
 	{
-		for (int k = 7; k < preset; k++)
+		for (int k = 0; k < preset; k++)
 		{
 			bool figurineIsNotEmptyOrSafe = !(board[i][k] == 'E' || board[i][k] == 'X'); //Checks if the figurine being taken is empty or safe space
 			bool figurineIsNotKing = board[i][k] != 'K';
