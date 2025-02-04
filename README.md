@@ -14,3 +14,5 @@
 21.01.2025 20:15 | Edited some checks that i missed.
 
 04.02.2025 18:26 | Made some Last second check-ups and found some bug which i fixed.
+
+04.02.2025 21:44 | Played the game a couple of times and found some last bugs. I fixed them and won't check for any more bugs. 
