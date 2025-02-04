@@ -12,3 +12,5 @@
 21.01.2025 17:16 | Did the latest debugging and fixed some logical bugs. The project runs good.
 
 21.01.2025 20:15 | Edited some checks that i missed.
+
+04.02.2025 18:26 | Made some Last second check-ups and found some bug which i fixed.
